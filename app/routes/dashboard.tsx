@@ -14,14 +14,14 @@ import {
   Banner,
 } from "@shopify/polaris";
 
-// TASK 1: Return promise directly for streaming (React Router v7)
+
 export async function loader() {
   return {
     inventoryPromise: getInventory(),
   };
 }
 
-// TASK 2: Action handler for claiming stock
+
 export async function action({ request }: Route.ActionArgs) {
   const formData = await request.formData();
   const itemId = formData.get("itemId") as string;
@@ -53,11 +53,11 @@ export default function Dashboard() {
   );
 }
 
-// TASK 3: Error fallback component for Await errors (contained within Card)
+
 function InventoryErrorFallback({ error }: { error?: unknown }) {
   const revalidator = useRevalidator();
   
-  // Error is passed as a prop from Await's errorElement
+
   const errorMessage = error instanceof Error ? error.message : "Failed to load inventory";
   
   return (
@@ -87,7 +87,7 @@ function LoadingSkeleton() {
   );
 }
 
-// TASK 2: Updated InventoryTable with Optimistic UI
+
 function InventoryTable({ items }: { items: Awaited<ReturnType<typeof getInventory>> }) {
   const rows = items.map((item) => [
     item.name,
@@ -104,26 +104,25 @@ function InventoryTable({ items }: { items: Awaited<ReturnType<typeof getInvento
   );
 }
 
-// TASK 2: Stock cell with optimistic updates
+
 function InventoryStockCell({ item }: { item: { id: string; name: string; stock: number } }) {
   const fetcher = useFetcher<typeof action>({ key: `claim-${item.id}` });
   
-  // Check if this fetcher is active (submitting or loading)
+ 
   const isUpdating = fetcher.state === "submitting" || fetcher.state === "loading";
   
-  // Check if there's an error
+
   const hasError = fetcher.data && !fetcher.data.success;
   
-  // Requirement 1: Optimistic update - decrease stock instantly when submitting
-  // Requirement 2: Rollback - if there's an error, show original stock (don't apply optimistic update)
+ 
   let displayStock = item.stock;
   
-  // Apply optimistic update during submitting OR loading state (before error is known)
+
   if (isUpdating && !hasError) {
     displayStock = Math.max(0, item.stock - 1);
   }
   
-  // If server returned success, React Router will revalidate and update item.stock automatically
+  
   
   return (
     <InlineStack gap="200" align="center">
@@ -140,11 +139,11 @@ function InventoryStockCell({ item }: { item: { id: string; name: string; stock:
   );
 }
 
-// TASK 2: Action cell with form and loading protection
+
 function InventoryActionCell({ item }: { item: { id: string; name: string; stock: number } }) {
   const fetcher = useFetcher({ key: `claim-${item.id}` });
   
-  // Check if THIS specific item is being submitted
+ 
   const isSubmitting = fetcher.state === "submitting" || fetcher.state === "loading";
   
   return (
@@ -162,7 +161,7 @@ function InventoryActionCell({ item }: { item: { id: string; name: string; stock
   );
 }
 
-// TASK 3: Route-Level ErrorBoundary - keeps Page structure visible, only Card shows error
+// TASK 3: Route-Level ErrorBoundary 
 export function ErrorBoundary() {
   const error = useRouteError();
   const revalidator = useRevalidator();
